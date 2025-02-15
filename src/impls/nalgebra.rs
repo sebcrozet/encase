@@ -6,14 +6,17 @@ use crate::{
 impl_vector!(2, nalgebra::VectorView2<'_, T>);
 impl_vector!(2, nalgebra::VectorViewMut2<'_, T>);
 impl_vector!(2, nalgebra::Vector2<T>);
+impl_vector!(2, nalgebra::Point2<T>; (T: nalgebra::Scalar));
 
 impl_vector!(3, nalgebra::VectorView3<'_, T>);
 impl_vector!(3, nalgebra::VectorViewMut3<'_, T>);
 impl_vector!(3, nalgebra::Vector3<T>);
+impl_vector!(3, nalgebra::Point3<T>; (T: nalgebra::Scalar));
 
 impl_vector!(4, nalgebra::VectorView4<'_, T>);
 impl_vector!(4, nalgebra::VectorViewMut4<'_, T>);
 impl_vector!(4, nalgebra::Vector4<T>);
+impl_vector!(4, nalgebra::Point4<T>; (T: nalgebra::Scalar));
 
 impl_matrix!(2, 2, nalgebra::MatrixView2<'_, T>);
 impl_matrix!(2, 2, nalgebra::MatrixViewMut2<'_, T>);
@@ -46,6 +49,34 @@ impl_matrix!(3, 4, nalgebra::Matrix4x3<T>);
 impl_matrix!(4, 4, nalgebra::MatrixView4<'_, T>);
 impl_matrix!(4, 4, nalgebra::MatrixViewMut4<'_, T>);
 impl_matrix!(4, 4, nalgebra::Matrix4<T>);
+
+impl<T: VectorScalar + nalgebra::Scalar, const N: usize> FromVectorParts<T, N> for nalgebra::Point<T, N>
+where nalgebra::SVector<T, N>: FromVectorParts<T, N>
+{
+    fn from_parts(parts: [T; N]) -> Self {
+       <nalgebra::SVector<T, N> as FromVectorParts<T, N>>::from_parts(parts).into()
+    }
+}
+
+impl<T: VectorScalar + nalgebra::Scalar, const N: usize> AsRefVectorParts<T, N>
+    for nalgebra::Point<T, N>
+where
+    nalgebra::SVector<T, N>: AsRefVectorParts<T, N>,
+{
+    fn as_ref_parts(&self) -> &[T; N] {
+        self.coords.as_ref_parts()
+    }
+}
+
+impl<T: VectorScalar + nalgebra::Scalar, const N: usize> AsMutVectorParts<T, N>
+for nalgebra::Point<T, N>
+where
+    nalgebra::SVector<T, N>: AsMutVectorParts<T, N>,
+{
+    fn as_mut_parts(&mut self) -> &mut [T; N] {
+        self.coords.as_mut_parts()
+    }
+}
 
 impl<T: VectorScalar, S, const N: usize> AsRefVectorParts<T, N>
     for nalgebra::Matrix<T, nalgebra::Const<N>, nalgebra::Const<1>, S>
